@@ -4,3 +4,5 @@ log.STABLE/
 build/
 install/
 cli/
+go.work
+go.work.backup

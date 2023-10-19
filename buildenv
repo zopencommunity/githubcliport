@@ -1,21 +1,31 @@
 export ZOPEN_STABLE_URL="https://github.com/cli/cli.git"
-export ZOPEN_STABLE_DEPS="comp_go make"
+export ZOPEN_STABLE_DEPS="make wharf"
 export ZOPEN_DEV_URL="https://github.com/cli/cli.git"
-export ZOPEN_DEV_DEPS="comp_go make"
+export ZOPEN_DEV_DEPS="make wharf"
 export ZOPEN_BUILD_LINE="STABLE"
 
 export ZOPEN_BOOTSTRAP="skip"
 export ZOPEN_CONFIGURE="skip"
-export ZOPEN_MAKE_OPTS="script/build"
+export ZOPEN_MAKE="go"
+export ZOPEN_MAKE_OPTS="build -o script/build script/build.go"
 export ZOPEN_CHECK_OPTS="test"
+export ZOPEN_INSTALL="zopen_install"
+export ZOPEN_CLEAN="zopen_clean"
+
+export ZOPEN_COMP=GO
+
+export ZOPEN_CONFIGURE="zopen_wharf"
+export ZOPEN_CONFIGURE_MINIMAL=1
+export ZOPEN_MAKE_MINIMAL=1
 
 zopen_init()
 {
   # Go installs binaries, so create the bin dir as well
+  export GOBIN=$ZOPEN_INSTALL_DIR/bin
+  mkdir -p \$ZOPEN_INSTALL_DIR/bin
   unset CC CXX
-  export CGO_ENABLED=0 # disable C Go as it's not needed 
+  export PATH=$PATH:$GOROOT/go-build-zos/bin
 }
-
 zopen_check_results()
 {
   dir="$1"
@@ -29,9 +39,28 @@ zopen_check_results()
   echo "expectedTotalTests:1"
 }
 
+
+zopen_wharf()
+{
+  cd ..
+  go work init
+  go work use ./cli/script
+  wharf ./cli/script/
+  cd ./cli
+}
+
+zopen_install()
+{
+  go install
+}
+
+zopen_clean()
+{
+  rm -rf ../.wharf_cache ../go.work* ../wharf_port
+}
+
 zopen_get_version()
 {
-  # Modify to echo the version of your tool/library
-  # Rather than hardcoding the version, obtain the version by running the tool/library
+
   echo "1.0.0"
 }
