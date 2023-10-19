@@ -4,6 +4,18 @@ export ZOPEN_DEV_URL="https://github.com/cli/cli.git"
 export ZOPEN_DEV_DEPS="comp_go make"
 export ZOPEN_BUILD_LINE="STABLE"
 
+export ZOPEN_BOOTSTRAP="skip"
+export ZOPEN_CONFIGURE="skip"
+export ZOPEN_MAKE_OPTS="script/build"
+export ZOPEN_CHECK_OPTS="test"
+
+zopen_init()
+{
+  # Go installs binaries, so create the bin dir as well
+  unset CC CXX
+  export CGO_ENABLED=0 # disable C Go as it's not needed 
+}
+
 zopen_check_results()
 {
   dir="$1"
@@ -15,16 +27,6 @@ zopen_check_results()
   echo "totalTests:1"
   echo "expectedFailures:0"
   echo "expectedTotalTests:1"
-}
-
-zopen_append_to_env()
-{
-  # echo envars outside of PATH, MANPATH, LIBPATH
-}
-
-zopen_append_to_setup()
-{
-  # echo commands that will run when installing via setup.sh
 }
 
 zopen_get_version()
