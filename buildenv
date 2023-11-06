@@ -1,57 +1,51 @@
-export ZOPEN_STABLE_URL="https://github.com/cli/cli.git"
-export ZOPEN_STABLE_DEPS="make wharf"
 export ZOPEN_DEV_URL="https://github.com/cli/cli.git"
-export ZOPEN_DEV_DEPS="make wharf"
-export ZOPEN_BUILD_LINE="STABLE"
-
-export ZOPEN_BOOTSTRAP="skip"
-export ZOPEN_CONFIGURE="skip"
-export ZOPEN_MAKE="go"
-export ZOPEN_MAKE_OPTS="build -o script/build script/build.go"
-export ZOPEN_CHECK_OPTS="test"
-export ZOPEN_INSTALL="zopen_install"
-export ZOPEN_CLEAN="zopen_clean"
-
+export ZOPEN_DEV_DEPS="comp_go make wharf patch git coreutils"
+export ZOPEN_BUILD_LINE="DEV"
+export ZOPEN_CONFIGURE=skip
 export ZOPEN_COMP=GO
 
 export ZOPEN_CONFIGURE="zopen_wharf"
 export ZOPEN_CONFIGURE_MINIMAL=1
+export ZOPEN_MAKE="zopen_build"
 export ZOPEN_MAKE_MINIMAL=1
+export ZOPEN_CHECK="skip"
+export ZOPEN_CLEAN="zopen_clean"
+
+export ZOPEN_INSTALL_OPTS="install prefix=\$ZOPEN_INSTALL_DIR"
+
+export ZOPEN_NAME="githubcli"
+
+ln -fs cli githubcli
 
 zopen_init()
 {
+  export CGO_ENABLED=0
   # Go installs binaries, so create the bin dir as well
   export GOBIN=$ZOPEN_INSTALL_DIR/bin
-  mkdir -p \$ZOPEN_INSTALL_DIR/bin
-  unset CC CXX
   export PATH=$PATH:$GOROOT/go-build-zos/bin
+  mkdir -p $ZOPEN_INSTALL_DIR
 }
-zopen_check_results()
+
+zopen_build()
 {
-  dir="$1"
-  pfx="$2"
-  chk="$1/$2_check.log"
-
-  # Echo the following information to gauge build health
-  echo "actualFailures:0"
-  echo "totalTests:1"
-  echo "expectedFailures:0"
-  echo "expectedTotalTests:1"
+  go build -o script/build script/build.go
+  set +e
+  ./script/build
+  set -e
+  ./script/build
 }
-
 
 zopen_wharf()
 {
   cd ..
-  go work init
-  go work use ./cli/script
-  wharf ./cli/script/
-  cd ./cli
-}
+  git clone https://github.com/AlecAivazis/survey.git
 
-zopen_install()
-{
-  go install
+  # AlecAivazis/survey needs a patch for cli to build
+  patch -u --ignore-whitespace ./survey/terminal/runereader_posix.go $ZOPEN_ROOT/patches/gopatch
+
+  go work init ./cli ./survey
+  wharf ./cli/...
+  cd ./cli
 }
 
 zopen_clean()
@@ -61,6 +55,5 @@ zopen_clean()
 
 zopen_get_version()
 {
-
-  echo "1.0.0"
+  ./bin/gh --version | head -1 | cut -f3 -d' ' | cut -d'-' -f1
 }
