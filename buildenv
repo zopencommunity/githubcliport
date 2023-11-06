@@ -1,5 +1,5 @@
 export ZOPEN_DEV_URL="https://github.com/cli/cli.git"
-export ZOPEN_DEV_DEPS="comp_go make wharf patch git coreutils"
+export ZOPEN_DEV_DEPS="comp_go make wharf git coreutils"
 export ZOPEN_BUILD_LINE="DEV"
 export ZOPEN_CONFIGURE=skip
 export ZOPEN_COMP=GO
@@ -29,9 +29,6 @@ zopen_init()
 zopen_build()
 {
   go build -o script/build script/build.go
-  set +e
-  ./script/build
-  set -e
   ./script/build
 }
 
@@ -39,18 +36,32 @@ zopen_wharf()
 {
   cd ..
   git clone https://github.com/AlecAivazis/survey.git
-
+  
+  cd survey
   # AlecAivazis/survey needs a patch for cli to build
-  patch -u --ignore-whitespace ./survey/terminal/runereader_posix.go $ZOPEN_ROOT/patches/gopatch
+  git apply ../patches/gopatch
+  cd ..
 
   go work init ./cli ./survey
   wharf ./cli/...
   cd ./cli
 }
 
+zopen_append_env() {
+  cat <<EOF
+export SSL_CERT_FILE=\$PWD/cacert.pem
+EOF
+}
+
+zopen_post_install()
+{
+  # Install a cacert.pem to be used (optionally) by the customer
+  $MYDIR/zopen update-cacert -f $1
+}
+
 zopen_clean()
 {
-  rm -rf ../.wharf_cache ../go.work* ../wharf_port
+  rm -rf ../.wharf_cache ../go.work* ../wharf_port ../survey
 }
 
 zopen_get_version()
