@@ -49,8 +49,6 @@ zopen_wharf()
   git apply ../patches/gopatch
   cd ..
 
-  ls
-
   go work init ./cli ./survey
   wharf ./cli/...
   cd ./cli
