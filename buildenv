@@ -1,9 +1,14 @@
+GITHUB_CLI_VERSION="2.38.0"
+export ZOPEN_BUILD_LINE="STABLE"
+export ZOPEN_STABLE_TAG="v${GITHUB_CLI_VERSION}"
+export ZOPEN_STABLE_URL="https://github.com/cli/cli.git"
+export ZOPEN_STABLE_DEPS="comp_go make wharf git coreutils"
+
 export ZOPEN_DEV_URL="https://github.com/cli/cli.git"
 export ZOPEN_DEV_DEPS="comp_go make wharf git coreutils"
-export ZOPEN_BUILD_LINE="DEV"
-export ZOPEN_CONFIGURE=skip
-export ZOPEN_COMP=GO
+export ZOPEN_DEV_BRANCH="trunk"
 
+export ZOPEN_COMP=GO
 export ZOPEN_CONFIGURE="zopen_wharf"
 export ZOPEN_CONFIGURE_MINIMAL=1
 export ZOPEN_MAKE="zopen_build"
@@ -41,6 +46,8 @@ zopen_wharf()
   # AlecAivazis/survey needs a patch for cli to build
   git apply ../patches/gopatch
   cd ..
+
+  ls
 
   go work init ./cli ./survey
   wharf ./cli/...
