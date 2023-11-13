@@ -54,7 +54,7 @@ zopen_wharf()
   cd ./cli
 }
 
-zopen_append_env() {
+zopen_append_to_env() {
   cat <<EOF
 export SSL_CERT_FILE=\$PWD/cacert.pem
 EOF
