@@ -1,5 +1,5 @@
 # bump: ghcli-version /GITHUB_CLI_VERSION="(.*)"/ https://github.com/cli/cli.git|semver:*
-GITHUB_CLI_VERSION="2.41.0"
+GITHUB_CLI_VERSION="2.44.1"
 
 export ZOPEN_BUILD_LINE="STABLE"
 export ZOPEN_STABLE_TAG="v${GITHUB_CLI_VERSION}"
