@@ -5,10 +5,10 @@ export ZOPEN_BUILD_LINE="STABLE"
 export ZOPEN_CATEGORIES="development networking"
 export ZOPEN_STABLE_TAG="v${GITHUB_CLI_VERSION}"
 export ZOPEN_STABLE_URL="https://github.com/cli/cli.git"
-export ZOPEN_STABLE_DEPS="comp_go make wharf git coreutils"
+export ZOPEN_STABLE_DEPS="comp_check_go make wharf git coreutils"
 
 export ZOPEN_DEV_URL="https://github.com/cli/cli.git"
-export ZOPEN_DEV_DEPS="comp_go make wharf git coreutils"
+export ZOPEN_DEV_DEPS="comp_check_go make wharf git coreutils"
 export ZOPEN_DEV_BRANCH="trunk"
 
 export ZOPEN_RUNTIME_DEPS="git"
