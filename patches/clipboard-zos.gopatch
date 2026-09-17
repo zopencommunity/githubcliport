@@ -1,0 +1,25 @@
+diff --git a/clipboard_zos.go b/clipboard_zos.go
+new file mode 100644
+index 0000000..0e9f176
+--- /dev/null
++++ b/clipboard_zos.go
+@@ -0,0 +1,19 @@
++//go:build zos
++
++// Copyright 2013 @atotto. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package clipboard
++
++func init() {
++	Unsupported = true
++}
++
++func readAll() (string, error) {
++	return "", nil
++}
++
++func writeAll(text string) error {
++	return nil
++}

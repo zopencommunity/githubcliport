@@ -23,9 +23,36 @@ export ZOPEN_CLEAN="zopen_clean"
 
 export ZOPEN_INSTALL_OPTS="install prefix=\$ZOPEN_INSTALL_DIR"
 
-export ZOPEN_NAME="githubcli"
+export ZOPEN_NAME="githubcli-${GITHUB_CLI_VERSION}"
 
-ln -fs cli githubcli
+clone_module()
+{
+  repo="$1"
+  dir="$2"
+  ref="$3"
+
+  if [ ! -d "${dir}/.git" ]; then
+    git clone "${repo}" "${dir}"
+  fi
+
+  git -C "${dir}" fetch --tags --force
+  git -C "${dir}" checkout --force "${ref}"
+  git -C "${dir}" clean -fdx
+}
+
+apply_port_patch()
+{
+  dir="$1"
+  patch="$2"
+
+  if ! git -C "${dir}" apply --check "../patches/${patch}"; then
+    echo "Patch ${patch} did not apply cleanly in ${dir}; assuming it was already applied or needs refresh."
+    git -C "${dir}" apply --reverse --check "../patches/${patch}" >/dev/null 2>&1 || return 1
+    return 0
+  fi
+
+  git -C "${dir}" apply "../patches/${patch}"
+}
 
 zopen_init()
 {
@@ -44,15 +71,18 @@ zopen_build()
 
 zopen_wharf()
 {
+  # When ZOPEN_CONFIGURE_MINIMAL=1, this function is called from inside the cli directory
+  # So we need to work relative to the parent directory
   cd ..
-  git clone https://github.com/AlecAivazis/survey.git
   
-  cd survey
-  # AlecAivazis/survey needs a patch for cli to build
-  git apply ../patches/gopatch
-  cd ..
+  clone_module https://github.com/atotto/clipboard.git clipboard v0.1.4
+  clone_module https://github.com/AlecAivazis/survey.git survey v2.3.7
+  clone_module https://github.com/charmbracelet/ultraviolet.git ultraviolet main
+  apply_port_patch clipboard clipboard-zos.gopatch || return 1
+  apply_port_patch survey gopatch || return 1
+  apply_port_patch ultraviolet ultraviolet.gopatch || return 1
 
-  go work init ./cli ./survey
+  go work init ./cli ./clipboard ./survey ./ultraviolet
   wharf ./cli/...
   cd ./cli
 }
@@ -71,7 +101,7 @@ zopen_post_install()
 
 zopen_clean()
 {
-  rm -rf ../.wharf_cache ../go.work* ../wharf_port ../survey
+  rm -rf ../.wharf_cache ../go.work* ../wharf_port ../survey ../ultraviolet ../clipboard
 }
 
 zopen_get_version()
